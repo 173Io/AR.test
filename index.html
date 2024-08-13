@@ -6,57 +6,55 @@
     <title>AR.js Ground Recognition</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
     <a-scene vr-mode-ui="enabled: false;" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <!-- 地面認識に基づいて3Dモデルを表示 -->
-        <a-entity gltf-model="url(cube.glb)" scale="0.1 0.1 0.1" position="0 0 -2" rotation="45 45 0"></a-entity>
+        <a-entity id="arModel" gltf-model="url(cube.glb)" scale="0.1 0.1 0.1" position="0 0 -2" rotation="45 45 0"></a-entity>
         <a-entity camera></a-entity>
     </a-scene>
 
     <button id="rotateButton" style="position: absolute; top: 10px; left: 10px;">Rotate</button>
-    <button id="scaleUpButton" style="position: absolute; top: 10px; left: 80px;">Scale Up</button>
-    <button id="scaleDownButton" style="position: absolute; top: 10px; left: 160px;">Scale Down</button>
-    <button id="screenshotButton" style="position: absolute; top: 10px; left: 240px;">Screenshot</button>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const model = document.querySelector('a-entity[gltf-model]');
+            const model = document.getElementById('arModel');
+            let initialDistance = null;
+
+            // ピンチジェスチャーを検出してモデルのスケールを変更
+            document.addEventListener('touchmove', function(event) {
+                if (event.touches.length === 2) {
+                    const touch1 = event.touches[0];
+                    const touch2 = event.touches[1];
+                    const currentDistance = Math.hypot(touch2.pageX - touch1.pageX, touch2.pageY - touch1.pageY);
+
+                    if (initialDistance == null) {
+                        initialDistance = currentDistance;
+                    } else {
+                        const scaleChange = currentDistance / initialDistance;
+                        const currentScale = model.getAttribute('scale');
+                        model.setAttribute('scale', {
+                            x: currentScale.x * scaleChange,
+                            y: currentScale.y * scaleChange,
+                            z: currentScale.z * scaleChange
+                        });
+                        initialDistance = currentDistance;
+                    }
+                }
+            });
+
+            // ピンチ操作が終わったら初期値をリセット
+            document.addEventListener('touchend', function(event) {
+                if (event.touches.length < 2) {
+                    initialDistance = null;
+                }
+            });
 
             // 回転
             document.getElementById('rotateButton').addEventListener('click', function() {
                 let rotation = model.getAttribute('rotation');
                 rotation.y += 45; // 45度回転
                 model.setAttribute('rotation', rotation);
-            });
-
-            // スケールアップ
-            document.getElementById('scaleUpButton').addEventListener('click', function() {
-                let scale = model.getAttribute('scale');
-                scale.x *= 1.1;
-                scale.y *= 1.1;
-                scale.z *= 1.1;
-                model.setAttribute('scale', scale);
-            });
-
-            // スケールダウン
-            document.getElementById('scaleDownButton').addEventListener('click', function() {
-                let scale = model.getAttribute('scale');
-                scale.x *= 0.9;
-                scale.y *= 0.9;
-                scale.z *= 0.9;
-                model.setAttribute('scale', scale);
-            });
-
-            // スクリーンショットを撮って新しいタブに表示（html2canvasを使用）
-            document.getElementById('screenshotButton').addEventListener('click', function() {
-                html2canvas(document.querySelector('a-scene')).then(canvas => {
-                    let image = canvas.toDataURL();
-                    let newTab = window.open();
-                    newTab.document.body.innerHTML = `<img src="${image}" style="width: 100%;">`;
-                    newTab.document.title = "Tap and hold to save image";
-                });
             });
         });
     </script>

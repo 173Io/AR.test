@@ -20,6 +20,8 @@
         document.addEventListener("DOMContentLoaded", function() {
             const model = document.getElementById('arModel');
             let initialDistance = null;
+            let isDragging = false;
+            let startPosition = null;
 
             // ピンチジェスチャーを検出してモデルのスケールを変更
             document.addEventListener('touchmove', function(event) {
@@ -40,12 +42,33 @@
                         });
                         initialDistance = currentDistance;
                     }
+                } else if (event.touches.length === 1 && isDragging) {
+                    // ドラッグしてモデルを移動
+                    const touch = event.touches[0];
+                    const dx = touch.pageX - startPosition.x;
+                    const dy = touch.pageY - startPosition.y;
+
+                    const newPosition = {
+                        x: model.object3D.position.x + dx * 0.01,
+                        y: model.object3D.position.y - dy * 0.01,
+                        z: model.object3D.position.z
+                    };
+
+                    model.setAttribute('position', newPosition);
+                    startPosition = { x: touch.pageX, y: touch.pageY };
                 }
             });
 
-            // ピンチ操作が終わったら初期値をリセット
+            document.addEventListener('touchstart', function(event) {
+                if (event.touches.length === 1) {
+                    isDragging = true;
+                    startPosition = { x: event.touches[0].pageX, y: event.touches[0].pageY };
+                }
+            });
+
             document.addEventListener('touchend', function(event) {
-                if (event.touches.length < 2) {
+                if (event.touches.length === 0) {
+                    isDragging = false;
                     initialDistance = null;
                 }
             });

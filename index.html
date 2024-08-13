@@ -49,13 +49,13 @@
                 model.setAttribute('scale', scale);
             });
 
-            // スクリーンショット（html2canvasを使用）
+            // スクリーンショットを撮って新しいタブに表示（html2canvasを使用）
             document.getElementById('screenshotButton').addEventListener('click', function() {
                 html2canvas(document.querySelector('a-scene')).then(canvas => {
-                    let link = document.createElement('a');
-                    link.download = 'screenshot.png';
-                    link.href = canvas.toDataURL();
-                    link.click();
+                    let image = canvas.toDataURL();
+                    let newTab = window.open();
+                    newTab.document.body.innerHTML = `<img src="${image}" style="width: 100%;">`;
+                    newTab.document.title = "Tap and hold to save image";
                 });
             });
         });

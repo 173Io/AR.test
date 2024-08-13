@@ -6,6 +6,7 @@
     <title>AR.js Ground Recognition</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
     <a-scene vr-mode-ui="enabled: false;" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
@@ -48,10 +49,14 @@
                 model.setAttribute('scale', scale);
             });
 
-            // スクリーンショット
+            // スクリーンショット（html2canvasを使用）
             document.getElementById('screenshotButton').addEventListener('click', function() {
-                const scene = document.querySelector('a-scene');
-                scene.components.screenshot.capture('perspective');
+                html2canvas(document.querySelector('a-scene')).then(canvas => {
+                    let link = document.createElement('a');
+                    link.download = 'screenshot.png';
+                    link.href = canvas.toDataURL();
+                    link.click();
+                });
             });
         });
     </script>

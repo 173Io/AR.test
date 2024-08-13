@@ -11,8 +11,49 @@
     <a-scene vr-mode-ui="enabled: false;" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <!-- 地面認識に基づいて3Dモデルを表示 -->
         <a-entity gltf-model="url(cube.glb)" scale="0.1 0.1 0.1" position="0 0 -2" rotation="45 45 0"></a-entity>
-
         <a-entity camera></a-entity>
     </a-scene>
+
+    <button id="rotateButton" style="position: absolute; top: 10px; left: 10px;">Rotate</button>
+    <button id="scaleUpButton" style="position: absolute; top: 10px; left: 80px;">Scale Up</button>
+    <button id="scaleDownButton" style="position: absolute; top: 10px; left: 160px;">Scale Down</button>
+    <button id="screenshotButton" style="position: absolute; top: 10px; left: 240px;">Screenshot</button>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const model = document.querySelector('a-entity[gltf-model]');
+
+            // 回転
+            document.getElementById('rotateButton').addEventListener('click', function() {
+                let rotation = model.getAttribute('rotation');
+                rotation.y += 45; // 45度回転
+                model.setAttribute('rotation', rotation);
+            });
+
+            // スケールアップ
+            document.getElementById('scaleUpButton').addEventListener('click', function() {
+                let scale = model.getAttribute('scale');
+                scale.x *= 1.1;
+                scale.y *= 1.1;
+                scale.z *= 1.1;
+                model.setAttribute('scale', scale);
+            });
+
+            // スケールダウン
+            document.getElementById('scaleDownButton').addEventListener('click', function() {
+                let scale = model.getAttribute('scale');
+                scale.x *= 0.9;
+                scale.y *= 0.9;
+                scale.z *= 0.9;
+                model.setAttribute('scale', scale);
+            });
+
+            // スクリーンショット
+            document.getElementById('screenshotButton').addEventListener('click', function() {
+                const scene = document.querySelector('a-scene');
+                scene.components.screenshot.capture('perspective');
+            });
+        });
+    </script>
 </body>
 </html>

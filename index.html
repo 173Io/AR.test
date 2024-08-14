@@ -6,8 +6,8 @@
     <title>AR.js Ground Recognition</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mayognaise/aframe-gesture-detector-component/dist/aframe-gesture-detector.min.js"></script>
     <style>
-        /* カスタムボタンのスタイル */
         #rotateRightButton, #rotateUpButton, #resetButton, #screenshotButton {
             position: absolute;
             z-index: 1;
@@ -42,7 +42,13 @@
 <body style="margin: 0; overflow: hidden;">
     <a-scene vr-mode-ui="enabled: false;" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
         <!-- 地面認識に基づいて3Dモデルを表示 -->
-        <a-entity id="arModel" gltf-model="url(cube.glb)" scale="0.1 0.1 0.1" position="0 0 -2" rotation="45 45 0"></a-entity>
+        <a-entity id="arModel" 
+                  gltf-model="url(cube.glb)" 
+                  scale="0.1 0.1 0.1" 
+                  position="0 0 -2" 
+                  rotation="45 45 0"
+                  gesture-detector>
+        </a-entity>
         <a-entity camera></a-entity>
     </a-scene>
 
@@ -91,31 +97,19 @@
                 clearInterval(rotateInterval);
             });
 
-            // ドラッグでの移動処理
-            let isDragging = false;
-            let startX, startY;
-
-            document.addEventListener('mousedown', function(event) {
-                isDragging = true;
-                startX = event.clientX;
-                startY = event.clientY;
+            // ドラッグとピンチ操作を利用して移動と拡大縮小を実装
+            model.addEventListener('gesture-swipe', function(event) {
+                let position = model.getAttribute('position');
+                position.x += event.detail.direction === 'right' ? 0.1 : -0.1;
+                model.setAttribute('position', position);
             });
 
-            document.addEventListener('mousemove', function(event) {
-                if (isDragging) {
-                    let deltaX = (event.clientX - startX) * 0.01;
-                    let deltaY = (event.clientY - startY) * 0.01;
-                    let position = model.getAttribute('position');
-                    position.x += deltaX;
-                    position.y -= deltaY;
-                    model.setAttribute('position', position);
-                    startX = event.clientX;
-                    startY = event.clientY;
-                }
-            });
-
-            document.addEventListener('mouseup', function() {
-                isDragging = false;
+            model.addEventListener('gesture-pinch', function(event) {
+                let scale = model.getAttribute('scale');
+                scale.x *= event.detail.scale;
+                scale.y *= event.detail.scale;
+                scale.z *= event.detail.scale;
+                model.setAttribute('scale', scale);
             });
 
             // リセットボタンの処理
@@ -130,8 +124,6 @@
                 document.getElementById('rotateUpButton').style.display = 'none';
                 document.getElementById('resetButton').style.display = 'none';
                 document.getElementById('screenshotButton').style.display = 'none';
-                // ここにスクリーンショットを撮る処理を追加
-                // 例えば、一定時間後にボタンを再表示するなど
                 setTimeout(() => {
                     document.getElementById('rotateRightButton').style.display = 'block';
                     document.getElementById('rotateUpButton').style.display = 'block';

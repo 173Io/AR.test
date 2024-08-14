@@ -6,6 +6,28 @@
     <title>AR.js Ground Recognition</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <style>
+        #screenshotButton, #rotateRightButton, #rotateUpButton, #resetButton {
+            position: absolute;
+            z-index: 1;
+        }
+        #rotateRightButton {
+            top: 10px;
+            left: 10px;
+        }
+        #rotateUpButton {
+            top: 50px;
+            left: 10px;
+        }
+        #resetButton {
+            top: 90px;
+            left: 10px;
+        }
+        #screenshotButton {
+            top: 10px;
+            right: 10px;
+        }
+    </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
     <a-scene vr-mode-ui="enabled: false;" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
@@ -14,12 +36,17 @@
         <a-entity camera></a-entity>
     </a-scene>
 
-    <button id="rotateRightButton" style="position: absolute; top: 10px; left: 10px;">Rotate Right</button>
-    <button id="rotateUpButton" style="position: absolute; top: 50px; left: 10px;">Rotate Up</button>
+    <button id="rotateRightButton">Rotate Right</button>
+    <button id="rotateUpButton">Rotate Up</button>
+    <button id="resetButton">Reset</button>
+    <button id="screenshotButton">Screenshot Mode</button>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const model = document.getElementById('arModel');
+            const initialPosition = { x: 0, y: 0, z: -2 };
+            const initialRotation = { x: 45, y: 45, z: 0 };
+            const initialScale = { x: 0.1, y: 0.1, z: 0.1 };
             let initialDistance = null;
             let isDragging = false;
             let startPosition = null;
@@ -50,8 +77,8 @@
                     const dy = touch.pageY - startPosition.y;
 
                     const newPosition = {
-                        x: model.object3D.position.x + dx * 0.01,
-                        y: model.object3D.position.y - dy * 0.01,
+                        x: model.object3D.position.x + dx * 0.005, // スケーリングファクターを調整
+                        y: model.object3D.position.y - dy * 0.005, // スケーリングファクターを調整
                         z: model.object3D.position.z
                     };
 
@@ -86,6 +113,22 @@
                 let rotation = model.getAttribute('rotation');
                 rotation.x += 45; // 45度上回転
                 model.setAttribute('rotation', rotation);
+            });
+
+            // リセット
+            document.getElementById('resetButton').addEventListener('click', function() {
+                model.setAttribute('position', initialPosition);
+                model.setAttribute('rotation', initialRotation);
+                model.setAttribute('scale', initialScale);
+            });
+
+            // スクリーンショットモード
+            document.getElementById('screenshotButton').addEventListener('click', function() {
+                const buttons = document.querySelectorAll('button');
+                buttons.forEach(button => button.style.display = 'none'); // ボタンを非表示
+                setTimeout(() => {
+                    buttons.forEach(button => button.style.display = 'block'); // ボタンを再表示
+                }, 3000); // 3秒後にボタンを再表示
             });
         });
     </script>

@@ -7,25 +7,37 @@
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.rawgit.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
     <style>
-        #screenshotButton, #rotateRightButton, #rotateUpButton, #resetButton {
+        /* ボタンのスタイルをカスタマイズ */
+        #rotateRightButton, #rotateUpButton, #resetButton, #screenshotButton {
             position: absolute;
             z-index: 1;
+            width: 50px;
+            height: 50px;
+            background-size: cover;
+            border: none;
+            cursor: pointer;
         }
+        
+        /* 各ボタンに画像を適用 */
         #rotateRightButton {
             top: 10px;
             left: 10px;
+            background-image: url('rotateRightButton.png'); /* 回転ボタンの画像 */
         }
         #rotateUpButton {
-            top: 50px;
+            top: 70px;
             left: 10px;
+            background-image: url('rotateUpButton.png'); /* 上回転ボタンの画像 */
         }
         #resetButton {
-            top: 90px;
+            top: 130px;
             left: 10px;
+            background-image: url('resetButton.png'); /* リセットボタンの画像 */
         }
         #screenshotButton {
             top: 10px;
             right: 10px;
+            background-image: url('screenshotButton.png'); /* スクリーンショットボタンの画像 */
         }
     </style>
 </head>
@@ -36,11 +48,10 @@
         <a-entity camera></a-entity>
     </a-scene>
 
-    <button id="rotateRightButton">Rotate Right</button>
-    <button id="rotateUpButton">Rotate Up</button>
-    <button id="resetButton">Reset</button>
-    <button id="screenshotButton">Screenshot Mode</button>
-
+    <button id="rotateRightButton"></button>
+    <button id="rotateUpButton"></button>
+    <button id="resetButton"></button>
+    <button id="screenshotButton"></button>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const model = document.getElementById('arModel');

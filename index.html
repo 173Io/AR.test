@@ -14,7 +14,8 @@
         <a-entity camera></a-entity>
     </a-scene>
 
-    <button id="rotateButton" style="position: absolute; top: 10px; left: 10px;">Rotate</button>
+    <button id="rotateRightButton" style="position: absolute; top: 10px; left: 10px;">Rotate Right</button>
+    <button id="rotateUpButton" style="position: absolute; top: 50px; left: 10px;">Rotate Up</button>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -73,10 +74,17 @@
                 }
             });
 
-            // 回転
-            document.getElementById('rotateButton').addEventListener('click', function() {
+            // 右回転
+            document.getElementById('rotateRightButton').addEventListener('click', function() {
                 let rotation = model.getAttribute('rotation');
-                rotation.y += 45; // 45度回転
+                rotation.y += 45; // 45度右回転
+                model.setAttribute('rotation', rotation);
+            });
+
+            // 上回転
+            document.getElementById('rotateUpButton').addEventListener('click', function() {
+                let rotation = model.getAttribute('rotation');
+                rotation.x += 45; // 45度上回転
                 model.setAttribute('rotation', rotation);
             });
         });
